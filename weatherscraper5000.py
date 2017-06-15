@@ -2,6 +2,8 @@
 
 import datetime
 import requests
+from bs4 import BeautifulSoup
+import json
 
 class WeatherScraper5000:
     """Parse and format weather data from Weather Underground."""
@@ -17,4 +19,37 @@ class WeatherScraper5000:
         }
         self.response = requests.get("https://www.wunderground.com/cgi-bin/findweather/getForecast",
                                      params=self.params)
-        
+        self.data = None
+    def __str__(self):
+        if self.data is None:
+            self.parse()
+        return str(self.data)
+
+    def parse(self):
+        html = BeautifulSoup(self.response.text, "html.parser")
+        #the first nine wx-values in the page are always the mean, max, and min temperatures
+        temps = html("span", class_="wx-value")
+        self.data = json.dumps(
+            {
+                "Mean Temperature": {
+                    "Actual": temps[0].string + " °F",
+                    "Average": temps[1].string + " °F"
+                },
+                "Max Temperature": {
+                    "Actual": temps[2].string + " °F",
+                    "Average": temps[3].string + " °F",
+                    "Record": {
+                        "Temperature": temps[4].string + " °F",
+                        "Year": ""
+                    }
+                },
+                "Min Temperature": {
+                    "Actual": temps[5].string + " °F",
+                    "Average": temps[6].string + " °F",
+                    "Record": {
+                        "Temperature": temps[7].string + " °F",
+                        "Year": ""
+                    }
+                }
+            }, indent=4
+        )
