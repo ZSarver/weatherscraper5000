@@ -28,3 +28,11 @@ or
 # Example
 
 > whistory "Atlanta, GA" 1987 05 17
+
+# Running tests
+
+To run all the tests, navigate to the main directory and do
+
+> python -m unittest -v
+
+or drop the -v for less verbose output.
