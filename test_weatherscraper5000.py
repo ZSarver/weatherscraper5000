@@ -12,6 +12,7 @@ from weatherscraper5000 import WeatherScraper5000
 class TestWeatherScraper5000(unittest.TestCase):
     def setUp(self):
         self.scraper = WeatherScraper5000("Atlanta, GA", datetime.date(1987, 5, 17))
+        self.maxDiff = 700
 
     def test_exist(self):
         self.assertIsNotNone(self.scraper)
@@ -21,6 +22,10 @@ class TestWeatherScraper5000(unittest.TestCase):
 
     def test_error_on_ambiguous(self):
         bad = WeatherScraper5000("Atlanta", datetime.date(1987, 5, 17))
+        self.assertRaises(error.URLError, bad.parse)
+
+    def test_error_on_nonexistant(self):
+        bad = WeatherScraper5000("fadsf876dsfgae", datetime.date(1987, 5, 17))
         self.assertRaises(error.URLError, bad.parse)
 
     def test_parses_weather_history(self):

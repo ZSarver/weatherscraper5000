@@ -29,6 +29,7 @@ class WeatherScraper5000:
         return str(self.data)
 
     def parse(self):
+        """This method parses the response to produce a json object"""
         html = BeautifulSoup(self.response.text, "html.parser")
         #check for errors
         #first check for a bad response
@@ -37,10 +38,23 @@ class WeatherScraper5000:
         #check for an ambiguous location
         ambi = html("p", class_="listHeading")
         if ambi:
-            if ambi[0].string == "Select a location:":
-                raise urllib.error.URLError("Ambiguous location given")
+            raise urllib.error.URLError("Ambiguous location given")
+        #check for nonexistant location
+        bad = html("p", class_="airport-not-found")
+        if bad:
+            raise urllib.error.URLError("Entered location doesn't exist")
         #the first nine wx-values in the page are always the mean, max, and min temperatures
         temps = html("span", class_="wx-value")
+        #the first two (####) numbers are record setting years
+        entries = html("td")
+        yearregex = re.compile("\(\d+\)")
+        years = []
+        for entry in entries:
+            year = yearregex.search(str(entry))
+            #each year is a regex match object, which means we can get the
+            #content of the match (with parentheses stripped) with year[0][1:5]
+            if year:
+                years.append(year)
         self.data = json.dumps(
             {
                 "Mean Temperature": {
@@ -52,7 +66,7 @@ class WeatherScraper5000:
                     "Average": temps[3].string + " °F",
                     "Record": {
                         "Temperature": temps[4].string + " °F",
-                        "Year": ""
+                        "Year": years[0][0][1:5]
                     }
                 },
                 "Min Temperature": {
@@ -60,7 +74,7 @@ class WeatherScraper5000:
                     "Average": temps[6].string + " °F",
                     "Record": {
                         "Temperature": temps[7].string + " °F",
-                        "Year": ""
+                        "Year": years[1][0][1:5]
                     }
                 }
             }, indent=4
