@@ -1,6 +1,5 @@
 """This module implements a web scraper for temperature history information."""
 
-import argparse
 import datetime
 import json
 import re
@@ -9,7 +8,7 @@ import urllib
 import requests
 from bs4 import BeautifulSoup
 
-class WeatherScraper5000:
+class Scraper:
     """Parse and format weather data from Weather Underground."""
     def __init__(self, location: str, date: datetime.date):
         self.params = {
@@ -84,24 +83,3 @@ class WeatherScraper5000:
                 }
             }, indent=4
         )
-
-def main():
-    """The main function takes 4 command line parameters, constructs a WeatherScraper object,
-    and pretty prints it to stdout"""
-    parser = argparse.ArgumentParser(description="Fetches temperature history.")
-    parser.add_argument(
-        'location',
-        help="the location to find temperature history; be sure to quote any spaces!")
-    maxyear = datetime.date.today().year + 1
-    parser.add_argument('year', type=int, choices=range(1947, maxyear),
-                        help="the year to find temperature history")
-    parser.add_argument('month', type=int, choices=range(1, 13),
-                        help="the month to find temperature history")
-    parser.add_argument('day', type=int, choices=range(1, 32),
-                        help="the day to find temperature history")
-    args = parser.parse_args()
-    scraper = WeatherScraper5000(args.location, datetime.date(args.year, args.month, args.day))
-    print(scraper)
-
-if __name__ == '__main__':
-    main()

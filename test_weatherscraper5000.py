@@ -11,7 +11,7 @@ from weatherscraper5000 import WeatherScraper5000
 
 class TestWeatherScraper5000(unittest.TestCase):
     def setUp(self):
-        self.scraper = WeatherScraper5000("Atlanta, GA", datetime.date(1987, 5, 17))
+        self.scraper = WeatherScraper5000.Scraper("Atlanta, GA", datetime.date(1987, 5, 17))
         self.maxDiff = 700
 
     def test_exist(self):
@@ -21,19 +21,19 @@ class TestWeatherScraper5000(unittest.TestCase):
         self.assertTrue(self.scraper.response.ok)
 
     def test_error_on_ambiguous(self):
-        bad = WeatherScraper5000("Atlanta", datetime.date(1987, 5, 17))
+        bad = WeatherScraper5000.Scraper("Atlanta", datetime.date(1987, 5, 17))
         self.assertRaises(error.URLError, bad.parse)
 
     def test_error_on_nonexistant(self):
-        bad = WeatherScraper5000("fadsf876dsfgae", datetime.date(1987, 5, 17))
+        bad = WeatherScraper5000.Scraper("fadsf876dsfgae", datetime.date(1987, 5, 17))
         self.assertRaises(error.URLError, bad.parse)
 
     def test_bad_date_future(self):
-        bad = WeatherScraper5000("Atlanta, GA", datetime.date(2525, 5, 17))
+        bad = WeatherScraper5000.Scraper("Atlanta, GA", datetime.date(2525, 5, 17))
         self.assertRaises(ValueError, bad.parse)
 
     def test_bad_date_past(self):
-        bad = WeatherScraper5000("Atlanta, GA", datetime.date(1900, 5, 17))
+        bad = WeatherScraper5000.Scraper("Atlanta, GA", datetime.date(1900, 5, 17))
         self.assertRaises(ValueError, bad.parse)
 
     def test_parses_weather_history(self):
@@ -63,11 +63,11 @@ class TestWeatherScraper5000(unittest.TestCase):
         self.assertEqual(str(self.scraper), str(expected))
 
     def test_main_success(self):
-        result = subprocess.run('python ./weatherscraper5000.py "atlanta, ga" 1987 5 17')
+        result = subprocess.run('python ./weatherscraper5000/__main__.py "atlanta, ga" 1987 5 17')
         self.assertEqual(result.returncode, 0)
 
     def test_main_fail(self):
-        result = subprocess.run('python ./weatherscraper5000.py "atlanta, ga" 1234 5 6')
+        result = subprocess.run('python ./weatherscraper5000/__main__.py "atlanta, ga" 1234 5 6')
         self.assertNotEqual(result.returncode, 0)
             
 if __name__ == '__main__':

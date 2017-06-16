@@ -9,7 +9,6 @@ setup(
     author_email="Zachary.Sarver@gmail.com",
     license="GNU GPL v3",
     entry_points={
-        "console_scripts": ["whistory = weatherscraper5000.main"]
     },
     install_requires=["beautifulsoup4>=4.6.0", "requests>=2.18.1"]
 )
