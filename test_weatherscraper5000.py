@@ -4,7 +4,7 @@ import unittest
 
 import datetime
 import json
-import requests
+import subprocess
 from urllib import error
 
 from weatherscraper5000 import WeatherScraper5000
@@ -27,6 +27,14 @@ class TestWeatherScraper5000(unittest.TestCase):
     def test_error_on_nonexistant(self):
         bad = WeatherScraper5000("fadsf876dsfgae", datetime.date(1987, 5, 17))
         self.assertRaises(error.URLError, bad.parse)
+
+    def test_bad_date_future(self):
+        bad = WeatherScraper5000("Atlanta, GA", datetime.date(2525, 5, 17))
+        self.assertRaises(ValueError, bad.parse)
+
+    def test_bad_date_past(self):
+        bad = WeatherScraper5000("Atlanta, GA", datetime.date(1900, 5, 17))
+        self.assertRaises(ValueError, bad.parse)
 
     def test_parses_weather_history(self):
         expected = json.dumps(
@@ -54,5 +62,13 @@ class TestWeatherScraper5000(unittest.TestCase):
             }, indent=4)
         self.assertEqual(str(self.scraper), str(expected))
 
+    def test_main_success(self):
+        result = subprocess.run('python ./weatherscraper5000.py "atlanta, ga" 1987 5 17')
+        self.assertEqual(result.returncode, 0)
+
+    def test_main_fail(self):
+        result = subprocess.run('python ./weatherscraper5000.py "atlanta, ga" 1234 5 6')
+        self.assertNotEqual(result.returncode, 0)
+            
 if __name__ == '__main__':
     unittest.main()
