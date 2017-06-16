@@ -3,8 +3,9 @@
 import unittest
 
 import datetime
-import requests
 import json
+import requests
+from urllib import error
 
 from weatherscraper5000 import WeatherScraper5000
 
@@ -16,7 +17,11 @@ class TestWeatherScraper5000(unittest.TestCase):
         self.assertIsNotNone(self.scraper)
 
     def test_fetches_weather_history(self):
-        self.assertEqual(self.scraper.response.status_code, requests.codes.ok)
+        self.assertTrue(self.scraper.response.ok)
+
+    def test_error_on_ambiguous(self):
+        bad = WeatherScraper5000("Atlanta", datetime.date(1987, 5, 17))
+        self.assertRaises(error.URLError, bad.parse)
 
     def test_parses_weather_history(self):
         expected = json.dumps(
